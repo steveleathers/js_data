@@ -48,12 +48,31 @@ var brands = [{
     "name": "HomeSweetHome"
 }];
 
-articles.forEach(function(article){
-	var result = brands.filter(function(brand){
-		return brand.id === article.brand_id;
-	});
-	delete article.brand_id;
-	article.brand = (result[0] !== undefined) ? result[0].name : null;
-});
+function join(lookupTable, mainTable, lookupKey, mainKey, select){
+	var l = lookupTable.length,
+	    m = mainTable.length,
+	    lookupIndex = [],
+	    output = [];
+	for (var i = 0; i < l; i++){
+		var row = lookupTable[i];
+		lookupIndex[row[lookupKey]] = row;
+	}
+	for (var j = 0; j < m; j++){
+		var y = mainTable[j];
+		var x = lookupIndex[y[mainKey]];
+		output.push(select(y, x));
+	}
 
-console.log(articles)
+	return output;
+}
+
+var results = join(brands, articles, "id", "brand_id", function(article, brand){
+	return {
+		id: article.id,
+		name: article.name,
+		weight: article.weight,
+		price: article.price,
+		brand: (brand !== undefined) ? brand.name : null
+	};
+});
+console.log(results);
